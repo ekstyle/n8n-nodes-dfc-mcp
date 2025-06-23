@@ -4,6 +4,8 @@ import { NodeConnectionType } from 'n8n-workflow';
 import { GetMemberOperation } from './operations/GetMemberOperation';
 import { CreateMemberOperation } from './operations/CreateMemberOperation';
 import { DeleteMemberOperation } from './operations/DeleteMemberOperation';
+import { TakeRewardChildrenOperation } from './operations/TakeRewardChildrenOperation';
+import { ListTargetsAvailableOperation } from './operations/ListTargetsAvailableOperation';
 
 export class DragonFamily implements INodeType {
     description: INodeTypeDescription = {
@@ -11,6 +13,7 @@ export class DragonFamily implements INodeType {
         name: 'dragonFamily',
         group: ['transform'],
         version: 1,
+        icon: { light: 'file:dragonFamily.svg', dark: 'file:dragonFamily.svg' },
         subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
         description: 'Interact with the Dragon Family API',
         defaults: {
@@ -73,12 +76,16 @@ export class DragonFamily implements INodeType {
                     GetMemberOperation.option,
                     CreateMemberOperation.option,
                     DeleteMemberOperation.option,
+                    TakeRewardChildrenOperation.option,
+                    ListTargetsAvailableOperation.option,
                 ],
                 default: 'getMember',
             },
             ...GetMemberOperation.fields,
             ...CreateMemberOperation.fields,
             ...DeleteMemberOperation.fields,
+            ...TakeRewardChildrenOperation.fields,
+            ...ListTargetsAvailableOperation.fields,
         ],
     };
 }
