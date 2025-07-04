@@ -1,26 +1,27 @@
 {
-  "name": "n8n-nodes-<...>",
-  "version": "0.1.0",
-  "description": "",
+  "name": "n8n-nodes-dragonfamily",
+  "version": "0.1.2",
+  "description": "Tools for dragon family api",
   "keywords": [
-    "n8n-community-node-package"
+    "DragonFamily", "n8n-community-node-package"
   ],
   "license": "MIT",
   "homepage": "",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "ekstyle",
+    "email": "support.ekstyle@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+    "url": "https://github.com/ekstyle/n8n-nodes-dfc-mcp.git"
   },
   "engines": {
     "node": ">=20.15"
   },
   "main": "index.js",
   "scripts": {
-    "build": "npx rimraf dist && tsc && gulp build:icons && robocopy ./dist ../.n8n/custom /e",
+    "build": "npx rimraf dist && tsc && gulp build:icons",
+    "deploy": "nrobocopy ./dist ../.n8n/custom /e",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
@@ -33,12 +34,8 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/ExampleCredentialsApi.credentials.js",
-      "dist/credentials/HttpBinApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/ExampleNode/ExampleNode.node.js",
-      "dist/nodes/HttpBin/HttpBin.node.js",
       "dist/nodes/DragonFamily/DragonFamily.node.js"
     ]
   },

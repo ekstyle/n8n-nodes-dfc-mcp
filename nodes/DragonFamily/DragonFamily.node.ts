@@ -79,7 +79,7 @@ export class DragonFamily implements INodeType {
                     TakeRewardChildrenOperation.option,
                     ListTargetsAvailableOperation.option,
                 ],
-                default: 'getMember',
+                default: '',
             },
             ...GetMemberOperation.fields,
             ...CreateMemberOperation.fields,
