@@ -1,11 +1,11 @@
 import type { INodeProperties, INodePropertyOptions } from 'n8n-workflow';
 
-export class CreateDailyTodoOperation {
+export class CreateSingleTodoOperation {
     public static readonly option: INodePropertyOptions = {
-        name: 'Create Daily Todo',
-        value: 'createDailyTodo',
-        description: 'Create one-time or recurring (daily/weekly) todo',
-        action: 'Create todo',
+        name: 'Create Single Todo',
+        value: 'createSingleTodo',
+        description: 'Create one-time todo for specific date',
+        action: 'Create single todo',
     };
 
     public static readonly fields: INodeProperties[] = [
@@ -19,7 +19,7 @@ export class CreateDailyTodoOperation {
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createDailyTodo'],
+                    operation: ['createSingleTodo'],
                 },
             },
         },
@@ -32,7 +32,7 @@ export class CreateDailyTodoOperation {
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createDailyTodo'],
+                    operation: ['createSingleTodo'],
                 },
             },
         },
@@ -45,7 +45,7 @@ export class CreateDailyTodoOperation {
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createDailyTodo'],
+                    operation: ['createSingleTodo'],
                 },
             },
         },
@@ -54,25 +54,12 @@ export class CreateDailyTodoOperation {
             name: 'date',
             type: 'string',
             default: '',
-            description: 'Start date YYYY-MM-DD. Omit for undated todos.',
+            required: true,
+            description: 'Task date YYYY-MM-DD (required for single todo)',
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createDailyTodo'],
-                },
-            },
-        },
-        {
-            displayName: 'Week Days',
-            name: 'weekDays',
-            type: 'string',
-            default: '',
-            placeholder: '0,1,2,3,4,5,6',
-            description: 'Comma-separated days 0-6 (0=Mon, 6=Sun). Example: "0,1,2,3,4,5,6" for daily.',
-            displayOptions: {
-                show: {
-                    resource: ['member'],
-                    operation: ['createDailyTodo'],
+                    operation: ['createSingleTodo'],
                 },
             },
         },
@@ -85,7 +72,7 @@ export class CreateDailyTodoOperation {
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createDailyTodo'],
+                    operation: ['createSingleTodo'],
                 },
             },
         },
@@ -99,7 +86,7 @@ export class CreateDailyTodoOperation {
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createDailyTodo'],
+                    operation: ['createSingleTodo'],
                 },
             },
         },
@@ -112,11 +99,9 @@ export class CreateDailyTodoOperation {
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createDailyTodo'],
+                    operation: ['createSingleTodo'],
                 },
             },
         },
     ];
 }
-
-

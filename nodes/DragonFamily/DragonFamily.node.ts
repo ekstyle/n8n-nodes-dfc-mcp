@@ -9,6 +9,7 @@ import { ListTodosOperation } from './operations/ListTodosOperation';
 import { ListTodosWithoutDateOperation } from './operations/ListTodosWithoutDateOperation';
 import { ListSkillsOperation } from './operations/ListSkillsOperation';
 import { CreateDailyTodoOperation } from './operations/CreateDailyTodoOperation';
+import { CreateSingleTodoOperation } from './operations/CreateSingleTodoOperation';
 
 export class DragonFamily implements INodeType {
     description: INodeTypeDescription = {
@@ -87,6 +88,7 @@ export class DragonFamily implements INodeType {
                     ListTodosWithoutDateOperation.option,
                     ListSkillsOperation.option,
                     CreateDailyTodoOperation.option,
+                    CreateSingleTodoOperation.option,
                 ],
                 default: '',
             },
@@ -101,6 +103,7 @@ export class DragonFamily implements INodeType {
             ...ListTodosWithoutDateOperation.fields,
             ...ListSkillsOperation.fields,
             ...CreateDailyTodoOperation.fields,
+            ...CreateSingleTodoOperation.fields,
         ],
     };
 
@@ -125,6 +128,112 @@ export class DragonFamily implements INodeType {
                     },
                 ],
             ];
+        }
+
+        if (operation === 'createDailyTodo') {
+            const baseUrl = this.getNodeParameter('baseUrl', 0) as string;
+            const token = this.getNodeParameter('token', 0) as string;
+            
+            // Get parameters
+            const todoTemplateId = this.getNodeParameter('todoTemplateId', 0) as string;
+            const title = this.getNodeParameter('title', 0) as string;
+            const date = this.getNodeParameter('date', 0) as string;
+            const weekDaysRaw = this.getNodeParameter('weekDays', 0) as string;
+            const assigneesRaw = this.getNodeParameter('assignees', 0) as string;
+            const dragons = this.getNodeParameter('dragons', 0) as number;
+            const description = this.getNodeParameter('description', 0) as string;
+            const image = this.getNodeParameter('image', 0) as number;
+
+            // Transform weekDays
+            const weekDays = String(weekDaysRaw || "")
+                .split(",")
+                .map(x => x.trim())
+                .filter(x => x !== "")
+                .map(x => +x)
+                .filter(x => Number.isInteger(x) && x >= 0 && x <= 6);
+
+            // Transform assignees  
+            const assignees = String(assigneesRaw || "")
+                .split(",")
+                .map(x => x.trim())
+                .filter(x => x !== "")
+                .map(x => +x)
+                .filter(Number.isFinite);
+
+            // Build request body
+            const requestBody: any = {};
+            if (todoTemplateId) requestBody.todo_template_id = todoTemplateId;
+            if (title) requestBody.title = title;
+            if (date) requestBody.date = date;
+            if (weekDays.length > 0) requestBody.week_days = weekDays;
+            if (assignees.length > 0) requestBody.assignees = assignees;
+            if (dragons) requestBody.dragons = dragons;
+            if (description) requestBody.description = description;
+            if (image) requestBody.image = image;
+            else requestBody.image = null;
+
+            // Make HTTP request
+            const response = await this.helpers.httpRequest({
+                method: 'POST',
+                url: `${baseUrl}/scheduler/v3/todo/create/`,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : '',
+                },
+                body: requestBody,
+                json: true,
+            });
+
+            return [[{ json: response }]];
+        }
+
+        if (operation === 'createSingleTodo') {
+            const baseUrl = this.getNodeParameter('baseUrl', 0) as string;
+            const token = this.getNodeParameter('token', 0) as string;
+            
+            // Get parameters
+            const todoTemplateId = this.getNodeParameter('todoTemplateId', 0) as string;
+            const title = this.getNodeParameter('title', 0) as string;
+            const date = this.getNodeParameter('date', 0) as string;
+            const assigneesRaw = this.getNodeParameter('assignees', 0) as string;
+            const dragons = this.getNodeParameter('dragons', 0) as number;
+            const description = this.getNodeParameter('description', 0) as string;
+            const image = this.getNodeParameter('image', 0) as number;
+
+            // Transform assignees  
+            const assignees = String(assigneesRaw || "")
+                .split(",")
+                .map(x => x.trim())
+                .filter(x => x !== "")
+                .map(x => +x)
+                .filter(Number.isFinite);
+
+            // Build request body (no week_days for single todo)
+            const requestBody: any = {};
+            if (todoTemplateId) requestBody.todo_template_id = todoTemplateId;
+            if (title) requestBody.title = title;
+            if (date) requestBody.date = date; // Required for single todo
+            if (assignees.length > 0) requestBody.assignees = assignees;
+            if (dragons) requestBody.dragons = dragons;
+            if (description) requestBody.description = description;
+            if (image) requestBody.image = image;
+            else requestBody.image = null;
+
+            // Make HTTP request
+            const response = await this.helpers.httpRequest({
+                method: 'POST',
+                url: `${baseUrl}/scheduler/v3/todo/create/`,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : '',
+                },
+                body: requestBody,
+                json: true,
+            });
+
+            return [[{ json: response }]];
         }
 
         // For other operations, return empty array (handled by routing)
