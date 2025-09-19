@@ -1,11 +1,14 @@
-import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
+import type { INodeType, INodeTypeDescription, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
 
-import { GetMemberOperation } from './operations/GetMemberOperation';
-import { CreateMemberOperation } from './operations/CreateMemberOperation';
-import { DeleteMemberOperation } from './operations/DeleteMemberOperation';
 import { TakeRewardChildrenOperation } from './operations/TakeRewardChildrenOperation';
 import { ListTargetsAvailableOperation } from './operations/ListTargetsAvailableOperation';
+import { CreateTargetOperation } from './operations/CreateTargetOperation';
+import { ListTasksAvailableOperation } from './operations/ListTasksAvailableOperation';
+import { ListTodosOperation } from './operations/ListTodosOperation';
+import { ListTodosWithoutDateOperation } from './operations/ListTodosWithoutDateOperation';
+import { ListSkillsOperation } from './operations/ListSkillsOperation';
+import { CreateDailyTodoOperation } from './operations/CreateDailyTodoOperation';
 
 export class DragonFamily implements INodeType {
     description: INodeTypeDescription = {
@@ -73,19 +76,58 @@ export class DragonFamily implements INodeType {
                     },
                 },
                 options: [
-                    GetMemberOperation.option,
-                    CreateMemberOperation.option,
-                    DeleteMemberOperation.option,
+                    // GetMemberOperation.option,
+                    // CreateMemberOperation.option,
+                    // DeleteMemberOperation.option,
                     TakeRewardChildrenOperation.option,
                     ListTargetsAvailableOperation.option,
+                    CreateTargetOperation.option,
+                    ListTasksAvailableOperation.option,
+                    ListTodosOperation.option,
+                    ListTodosWithoutDateOperation.option,
+                    ListSkillsOperation.option,
+                    CreateDailyTodoOperation.option,
                 ],
                 default: '',
             },
-            ...GetMemberOperation.fields,
-            ...CreateMemberOperation.fields,
-            ...DeleteMemberOperation.fields,
+            // ...GetMemberOperation.fields,
+            // ...CreateMemberOperation.fields,
+            // ...DeleteMemberOperation.fields,
             ...TakeRewardChildrenOperation.fields,
             ...ListTargetsAvailableOperation.fields,
+            ...CreateTargetOperation.fields,
+            ...ListTasksAvailableOperation.fields,
+            ...ListTodosOperation.fields,
+            ...ListTodosWithoutDateOperation.fields,
+            ...ListSkillsOperation.fields,
+            ...CreateDailyTodoOperation.fields,
         ],
     };
+
+    async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+        const operation = this.getNodeParameter('operation', 0) as string;
+
+        if (operation === 'listSkills') {
+            const skillsData = {
+                relationships_building: 'Relationship building is the ability to connect with others, listen and understand them, express thoughts and feelings, resolve conflicts, and find compromises.',
+                self_reliance: 'Self-reliance is the ability to make decisions, set goals independently, solve your own problems, and take responsibility for your freedom of choice.',
+                sense_of_purpose: 'Sense of purpose is the ability to stay focused on set goals, overcome obstacles, and keep going despite difficulties.',
+                money_management: 'Money management is the ability to plan expenses, save money, and allocate income effectively.',
+                creativity: 'Creativity is the ability to find unconventional solutions, see things differently, and express thoughts and feelings through art.',
+                critical_thinking: 'Critical thinking is the ability to analyze information, identify key points, compare and evaluate viewpoints, and make reasoned decisions.',
+                lifetime_learning: 'Lifelong learning is the ability and motivation to continuously acquire knowledge and improve existing skills.',
+            };
+
+            return [
+                [
+                    {
+                        json: skillsData,
+                    },
+                ],
+            ];
+        }
+
+        // For other operations, return empty array (handled by routing)
+        return [];
+    }
 }
