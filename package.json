@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-dragonfamily",
-  "version": "0.1.10",
+  "version": "0.1.12",
   "description": "Tools for dragon family api",
   "keywords": [
     "DragonFamily",
