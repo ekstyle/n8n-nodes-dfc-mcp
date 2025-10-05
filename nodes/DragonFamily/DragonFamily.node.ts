@@ -10,6 +10,7 @@ import { ListTodosWithoutDateOperation } from './operations/ListTodosWithoutDate
 import { ListSkillsOperation } from './operations/ListSkillsOperation';
 import { CreateDailyTodoOperation } from './operations/CreateDailyTodoOperation';
 import { CreateSingleTodoOperation } from './operations/CreateSingleTodoOperation';
+import { UpdateDailyTodoOperation } from './operations/UpdateDailyTodoOperation';
 
 export class DragonFamily implements INodeType {
     description: INodeTypeDescription = {
@@ -19,7 +20,7 @@ export class DragonFamily implements INodeType {
         version: 1,
         icon: { light: 'file:dragonFamily.svg', dark: 'file:dragonFamily.svg' },
         subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-        description: 'Interact with the Dragon Family API',
+        description: 'Управление семейными задачами через API Dragon Family. Создавайте ежедневные и разовые задачи, обновляйте существующие, получайте списки todo и работайте с целями. Поддерживает планирование повторяющихся задач по дням недели, назначение исполнителей и систему вознаграждений драконами.',
         defaults: {
             name: 'Dragon Family',
         },
@@ -89,6 +90,7 @@ export class DragonFamily implements INodeType {
                     ListSkillsOperation.option,
                     CreateDailyTodoOperation.option,
                     CreateSingleTodoOperation.option,
+                    UpdateDailyTodoOperation.option,
                 ],
                 default: '',
             },
@@ -104,6 +106,7 @@ export class DragonFamily implements INodeType {
             ...ListSkillsOperation.fields,
             ...CreateDailyTodoOperation.fields,
             ...CreateSingleTodoOperation.fields,
+            ...UpdateDailyTodoOperation.fields,
         ],
     };
 
@@ -133,7 +136,7 @@ export class DragonFamily implements INodeType {
         if (operation === 'createDailyTodo') {
             const baseUrl = this.getNodeParameter('baseUrl', 0) as string;
             const token = this.getNodeParameter('token', 0) as string;
-            
+
             // Get parameters
             const todoTemplateId = this.getNodeParameter('todoTemplateId', 0) as string;
             const title = this.getNodeParameter('title', 0) as string;
@@ -141,8 +144,6 @@ export class DragonFamily implements INodeType {
             const weekDaysRaw = this.getNodeParameter('weekDays', 0) as string;
             const assigneesRaw = this.getNodeParameter('assignees', 0) as string;
             const dragons = this.getNodeParameter('dragons', 0) as number;
-            const description = this.getNodeParameter('description', 0) as string;
-            const image = this.getNodeParameter('image', 0) as number;
 
             // Transform weekDays
             const weekDays = String(weekDaysRaw || "")
@@ -152,7 +153,7 @@ export class DragonFamily implements INodeType {
                 .map(x => +x)
                 .filter(x => Number.isInteger(x) && x >= 0 && x <= 6);
 
-            // Transform assignees  
+            // Transform assignees
             const assignees = String(assigneesRaw || "")
                 .split(",")
                 .map(x => x.trim())
@@ -168,9 +169,8 @@ export class DragonFamily implements INodeType {
             if (weekDays.length > 0) requestBody.week_days = weekDays;
             if (assignees.length > 0) requestBody.assignees = assignees;
             if (dragons) requestBody.dragons = dragons;
-            if (description) requestBody.description = description;
-            if (image) requestBody.image = image;
-            else requestBody.image = null;
+            requestBody.description = '';
+            requestBody.image = null;
 
             // Make HTTP request
             const response = await this.helpers.httpRequest({
@@ -180,6 +180,7 @@ export class DragonFamily implements INodeType {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': token ? `Bearer ${token}` : '',
+									  'X-Workflow-Source': 'n8n',
                 },
                 body: requestBody,
                 json: true,
@@ -191,17 +192,15 @@ export class DragonFamily implements INodeType {
         if (operation === 'createSingleTodo') {
             const baseUrl = this.getNodeParameter('baseUrl', 0) as string;
             const token = this.getNodeParameter('token', 0) as string;
-            
+
             // Get parameters
             const todoTemplateId = this.getNodeParameter('todoTemplateId', 0) as string;
             const title = this.getNodeParameter('title', 0) as string;
             const date = this.getNodeParameter('date', 0) as string;
             const assigneesRaw = this.getNodeParameter('assignees', 0) as string;
             const dragons = this.getNodeParameter('dragons', 0) as number;
-            const description = this.getNodeParameter('description', 0) as string;
-            const image = this.getNodeParameter('image', 0) as number;
 
-            // Transform assignees  
+            // Transform assignees
             const assignees = String(assigneesRaw || "")
                 .split(",")
                 .map(x => x.trim())
@@ -216,9 +215,8 @@ export class DragonFamily implements INodeType {
             if (date) requestBody.date = date; // Required for single todo
             if (assignees.length > 0) requestBody.assignees = assignees;
             if (dragons) requestBody.dragons = dragons;
-            if (description) requestBody.description = description;
-            if (image) requestBody.image = image;
-            else requestBody.image = null;
+            requestBody.description = '';
+            requestBody.image = null;
 
             // Make HTTP request
             const response = await this.helpers.httpRequest({
@@ -228,6 +226,54 @@ export class DragonFamily implements INodeType {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': token ? `Bearer ${token}` : '',
+									  'X-Workflow-Source': 'n8n',
+                },
+                body: requestBody,
+                json: true,
+            });
+
+            return [[{ json: response }]];
+        }
+
+        if (operation === 'updateDailyTodo') {
+            const baseUrl = this.getNodeParameter('baseUrl', 0) as string;
+            const token = this.getNodeParameter('token', 0) as string;
+
+            // Get parameters
+            const todoId = this.getNodeParameter('todoId', 0) as string;
+            const date = this.getNodeParameter('date', 0) as string;
+            const title = this.getNodeParameter('title', 0) as string;
+            const dragons = this.getNodeParameter('dragons', 0) as number;
+            const weekDaysRaw = this.getNodeParameter('weekDays', 0) as string;
+
+            // Transform weekDays if provided
+            let weekDays: number[] | undefined;
+            if (weekDaysRaw && weekDaysRaw.trim()) {
+                weekDays = String(weekDaysRaw)
+                    .split(",")
+                    .map(x => x.trim())
+                    .filter(x => x !== "")
+                    .map(x => +x)
+                    .filter(x => Number.isInteger(x) && x >= 0 && x <= 6);
+            }
+
+            // Build request body - only include fields that are provided
+            const requestBody: any = {};
+            if (title) requestBody.title = title;
+            requestBody.description = '';
+            requestBody.image = null;
+            if (dragons) requestBody.default_max_dragons = dragons;
+            if (weekDays && weekDays.length > 0) requestBody.week_days = weekDays;
+
+            // Make HTTP PATCH request
+            const response = await this.helpers.httpRequest({
+                method: 'PATCH',
+                url: `${baseUrl}/scheduler/v3/todo/${date}/${todoId}/`,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : '',
+									  'X-Workflow-Source': 'n8n',
                 },
                 body: requestBody,
                 json: true,

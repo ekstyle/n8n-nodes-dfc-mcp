@@ -1,51 +1,25 @@
 import type { INodeProperties, INodePropertyOptions } from 'n8n-workflow';
 
-export class CreateSingleTodoOperation {
+export class UpdateDailyTodoOperation {
     public static readonly option: INodePropertyOptions = {
-        name: 'Create Single Todo',
-        value: 'createSingleTodo',
-        description: 'Create one-time todo for specific date',
-        action: 'Create single todo',
+        name: 'Update Daily Todo',
+        value: 'updateDailyTodo',
+        description: 'Update existing daily todo for specific date',
+        action: 'Update daily todo',
     };
 
     public static readonly fields: INodeProperties[] = [
         {
-            displayName: 'Assignees',
-            name: 'assignees',
+            displayName: 'Todo ID',
+            name: 'todoId',
             type: 'string',
             default: '',
-            placeholder: '1001,1002',
-            description: 'Comma-separated profile IDs (e.g., 1001,1002)',
+            required: true,
+            description: 'ID of the todo to update (e.g., 8446164)',
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createSingleTodo'],
-                },
-            },
-        },
-        {
-            displayName: 'Template ID',
-            name: 'todoTemplateId',
-            type: 'string',
-            default: '',
-            description: 'If provided, todo is created from template',
-            displayOptions: {
-                show: {
-                    resource: ['member'],
-                    operation: ['createSingleTodo'],
-                },
-            },
-        },
-        {
-            displayName: 'Title',
-            name: 'title',
-            type: 'string',
-            default: '',
-            description: 'Required when no template is specified',
-            displayOptions: {
-                show: {
-                    resource: ['member'],
-                    operation: ['createSingleTodo'],
+                    operation: ['updateDailyTodo'],
                 },
             },
         },
@@ -55,24 +29,24 @@ export class CreateSingleTodoOperation {
             type: 'string',
             default: '',
             required: true,
-            description: 'Task date YYYY-MM-DD (required for single todo)',
+            description: 'Date for which to update todo YYYY-MM-DD',
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createSingleTodo'],
+                    operation: ['updateDailyTodo'],
                 },
             },
         },
         {
-            displayName: 'Dragons',
-            name: 'dragons',
-            type: 'number',
-            default: 0,
-            description: 'Reward amount (optional, from template if omitted)',
+            displayName: 'Title',
+            name: 'title',
+            type: 'string',
+            default: '',
+            description: 'New title for the todo',
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createSingleTodo'],
+                    operation: ['updateDailyTodo'],
                 },
             },
         },
@@ -82,11 +56,24 @@ export class CreateSingleTodoOperation {
             type: 'string',
             default: '',
             typeOptions: { rows: 3 },
-            description: 'Optional description',
+            description: 'New description for the todo',
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createSingleTodo'],
+                    operation: ['updateDailyTodo'],
+                },
+            },
+        },
+        {
+            displayName: 'Dragons',
+            name: 'dragons',
+            type: 'number',
+            default: 0,
+            description: 'New reward amount',
+            displayOptions: {
+                show: {
+                    resource: ['member'],
+                    operation: ['updateDailyTodo'],
                 },
             },
         },
@@ -95,11 +82,25 @@ export class CreateSingleTodoOperation {
             name: 'image',
             type: 'number',
             default: null,
-            description: 'UImage ID (optional)',
+            description: 'New image ID for the todo',
             displayOptions: {
                 show: {
                     resource: ['member'],
-                    operation: ['createSingleTodo'],
+                    operation: ['updateDailyTodo'],
+                },
+            },
+        },
+        {
+            displayName: 'Week Days',
+            name: 'weekDays',
+            type: 'string',
+            default: '',
+            placeholder: '0,1,2,3,4,5,6',
+            description: 'Update week days (0=Mon, 6=Sun). Leave empty to keep unchanged.',
+            displayOptions: {
+                show: {
+                    resource: ['member'],
+                    operation: ['updateDailyTodo'],
                 },
             },
         },

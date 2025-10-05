@@ -107,7 +107,7 @@ export class CreateDailyTodoOperation {
             displayName: 'Image ID',
             name: 'image',
             type: 'number',
-            default: 0,
+            default: null,
             description: 'UImage ID (optional)',
             displayOptions: {
                 show: {
